@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        SLACK_CHANNEL = '#gitping'
-        SLACK_COLOR = 'good'
+        SLACK_CHANNEL_ID = 'C09F8HM77L6'
+        SLACK_TOKEN = credentials('Slack_Token') // Jenkins credential ID for your xoxb token
         GITHUB_REPO = 'VereshG/Golang'
     }
 
@@ -19,30 +19,39 @@ pipeline {
     post {
         success {
             script {
-                // Extract PR number from merge commit message
                 def prNumber = sh(script: "git log -1 --pretty=format:'%s' | grep -oE 'pull request #[0-9]+' | grep -oE '[0-9]+' || echo 'N/A'", returnStdout: true).trim()
-                
-                // Extract author of the merge commit
                 def prAuthor = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
-
-                // Construct PR link
                 def prLink = "https://github.com/${env.GITHUB_REPO}/pull/${prNumber}"
+                def message = "✅ PR #${prNumber} was merged by *${prAuthor}*\n🔗 ${prLink}"
 
-                slackSend (
-                    channel: env.SLACK_CHANNEL,
-                    color: env.SLACK_COLOR,
-                    tokenCredentialId: 'Slack_Token',
-                    message: "✅ PR #${prNumber} was merged by *${prAuthor}*\n🔗 ${prLink}"
-                )
+                sh """
+                curl -X POST \
+                  -H "Authorization: Bearer ${SLACK_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d '{
+                        "channel": "${SLACK_CHANNEL_ID}",
+                        "text": "${message}"
+                      }' \
+                  https://slack.com/api/chat.postMessage
+                """
             }
         }
+
         failure {
-            slackSend (
-                channel: env.SLACK_CHANNEL,
-                color: 'danger',
-                tokenCredentialId: 'Slack_Token',
-                message: "❌ Build failed after PR merge on branch ${env.GIT_BRANCH}"
-            )
+            script {
+                def message = "❌ Build failed after PR merge on branch ${env.GIT_BRANCH}"
+
+                sh """
+                curl -X POST \
+                  -H "Authorization: Bearer ${SLACK_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d '{
+                        "channel": "${SLACK_CHANNEL_ID}",
+                        "text": "${message}"
+                      }' \
+                  https://slack.com/api/chat.postMessage
+                """
+            }
         }
     }
 }
