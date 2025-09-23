@@ -18,8 +18,9 @@ pipeline {
                 script {
                     def previousCommit = sh(script: "git rev-parse HEAD^1", returnStdout: true).trim()
                     def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    def changedFiles = sh(script: "git diff --name-only ${previousCommit} ${currentCommit}", returnStdout: true).trim().split('\n')
-                    echo "Changed files: ${changedFiles}"
+                        memberCoreChannel = "YOUR_MEMBERCORE_CHANNEL_ID"
+                        memberFundsChannel = "YOUR_MEMBERFUNDS_CHANNEL_ID"
+                        generalChannel = "YOUR_GENERAL_CHANNEL_ID" // <-- Add your general Slack channel ID here
                 }
             }
         }
@@ -55,8 +56,10 @@ pipeline {
                     def prAuthor = env.PR_AUTHOR
                     def prLink = env.PR_LINK
                     def sent = false
-                    // Notify membercore team if get_handler.go changed
-                    if (changedFiles.contains('api/get_handler.go')) {
+                    // Only notify relevant team if endpoint file changed
+                    def onlyGetChanged = changedFiles.every { it == 'api/get_handler.go' }
+                    def onlyPostChanged = changedFiles.every { it == 'api/post_handler.go' }
+                    if (onlyGetChanged) {
                         def appName = 'membercore'
                         def channelID = memberCoreChannel
                         echo "App Name: ${appName}"
@@ -77,10 +80,7 @@ Please review!
                             -d '{"channel": "${channelID}", "text": "${message}"}' \
                             https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                         """
-                        sent = true
-                    }
-                    // Notify member funds team if post_handler.go changed
-                    if (changedFiles.contains('api/post_handler.go')) {
+                    } else if (onlyPostChanged) {
                         def appName = 'member funds'
                         def channelID = memberFundsChannel
                         echo "App Name: ${appName}"
@@ -101,31 +101,34 @@ Please review!
                             -d '{"channel": "${channelID}", "text": "${message}"}' \
                             https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                         """
-                        sent = true
-                    }
-                    if (!changedFiles.contains('api/get_handler.go') && !changedFiles.contains('api/post_handler.go')) {
-                        // Notify about other changed files
-                        def otherFiles = changedFiles.findAll { it != 'api/get_handler.go' && it != 'api/post_handler.go' }
-                        if (otherFiles.size() > 0) {
-                            def channelID = generalChannel // Replace with your general channel variable or ID
-                            def message = """
+                    } else if (changedFiles.size() > 0) {
+                        // If any other file (or both endpoints) changed, notify both teams
+                        def message = """
 *✅ PR #${prNumber} merged by ${prAuthor}*
 ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
-*Other files changed:*
-${otherFiles.join('\n')}
+*Files changed:*
+${changedFiles.join('\n')}
 Please review!
 """
-                            echo "Sending Slack notification to ${channelID} for non-endpoint file changes: ${otherFiles}"
-                            sh """
-                            curl -X POST \
-                                -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
-                                -H "Content-Type: application/json" \
-                                -d '{"channel": "${channelID}", "text": "${message}"}' \
-                                https://slack.com/api/chat.postMessage || echo "Slack notification failed"
-                            """
-                        } else {
-                            echo "No relevant API file changed. No notification sent."
-                        }
+                        echo "Sending Slack notification to ${memberCoreChannel} and ${memberFundsChannel} for non-endpoint or multiple endpoint file changes: ${changedFiles}"
+                        // Notify memberCoreChannel
+                        sh """
+                        curl -X POST \
+                            -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
+                            -H "Content-Type: application/json" \
+                            -d '{"channel": "${memberCoreChannel}", "text": "${message}"}' \
+                            https://slack.com/api/chat.postMessage || echo "Slack notification failed"
+                        """
+                        // Notify memberFundsChannel
+                        sh """
+                        curl -X POST \
+                            -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
+                            -H "Content-Type: application/json" \
+                            -d '{"channel": "${memberFundsChannel}", "text": "${message}"}' \
+                            https://slack.com/api/chat.postMessage || echo "Slack notification failed"
+                        """
+                    } else {
+                        echo "No relevant file changed. No notification sent."
                     }
                 } else {
                     echo "PR was not merged to main branch. No notifications sent."
