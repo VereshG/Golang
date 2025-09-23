@@ -13,5 +13,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getSharedMessage() string {
+	// [PR DEMO] This comment added to test Jenkins and PR notification
 	return "This is a shared message between GET and POST handlers."
 }
