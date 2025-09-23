@@ -68,12 +68,13 @@ ${changedFiles.join('\n')}
 *API changed:* ${appName}
 Please review!
 """
+                        echo "Sending Slack notification to ${channelID} with message: ${message}"
                         sh """
                         curl -X POST \
                             -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
                             -H "Content-Type: application/json" \
                             -d '{"channel": "${channelID}", "text": "${message}"}' \
-                            https://slack.com/api/chat.postMessage
+                            https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                         """
                         sent = true
                     }
@@ -90,12 +91,13 @@ ${changedFiles.join('\n')}
 *API changed:* ${appName}
 Please review!
 """
+                        echo "Sending Slack notification to ${channelID} with message: ${message}"
                         sh """
                         curl -X POST \
                             -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
                             -H "Content-Type: application/json" \
                             -d '{"channel": "${channelID}", "text": "${message}"}' \
-                            https://slack.com/api/chat.postMessage
+                            https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                         """
                         sent = true
                     }
@@ -117,20 +119,22 @@ Please review!
                     echo "Notification sent to channel: ${memberCoreChannel}"
                     echo "Notification sent to channel: ${memberFundsChannel}"
                     // Notify member core team
+                    echo "Sending Slack notification to ${memberCoreChannel} with message: ${message}"
                     sh """
                     curl -X POST \
                         -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
                         -H "Content-Type: application/json" \
                         -d '{"channel": "${memberCoreChannel}", "text": "${message}"}' \
-                        https://slack.com/api/chat.postMessage
+                        https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                     """
                     // Notify member funds team
+                    echo "Sending Slack notification to ${memberFundsChannel} with message: ${message}"
                     sh """
                     curl -X POST \
                         -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
                         -H "Content-Type: application/json" \
                         -d '{"channel": "${memberFundsChannel}", "text": "${message}"}' \
-                        https://slack.com/api/chat.postMessage
+                        https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                     """
                 } else {
                     echo "Build failed, but not on main branch. No notifications sent."
