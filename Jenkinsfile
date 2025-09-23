@@ -77,7 +77,7 @@ Please review!
 """
                         sh """
                         curl -X POST \
-                            -H "Authorization: Bearer ${SLACK_TOKEN}" \
+                            -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
                             -H "Content-Type: application/json" \
                             -d '{"channel": "${channelID}", "text": "${message}"}' \
                             https://slack.com/api/chat.postMessage
@@ -102,7 +102,7 @@ Please review!
                     // Notify member core team
                     sh """
                     curl -X POST \
-                        -H "Authorization: Bearer ${SLACK_TOKEN}" \
+                        -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
                         -H "Content-Type: application/json" \
                         -d '{"channel": "${memberCoreChannel}", "text": "${message}"}' \
                         https://slack.com/api/chat.postMessage
@@ -110,7 +110,7 @@ Please review!
                     // Notify member funds team
                     sh """
                     curl -X POST \
-                        -H "Authorization: Bearer ${SLACK_TOKEN}" \
+                        -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
                         -H "Content-Type: application/json" \
                         -d '{"channel": "${memberFundsChannel}", "text": "${message}"}' \
                         https://slack.com/api/chat.postMessage
