@@ -14,8 +14,13 @@ pipeline {
                 // Your build steps here
                 echo 'Fetching latest main branch...'
                 sh 'git fetch origin main'
-                echo 'Changed files in this PR:'
-                sh 'git diff --name-only origin/main...HEAD'
+                echo 'Getting previous and current commit SHAs...'
+                script {
+                    def previousCommit = sh(script: "git rev-parse HEAD^1", returnStdout: true).trim()
+                    def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                    def changedFiles = sh(script: "git diff --name-only ${previousCommit} ${currentCommit}", returnStdout: true).trim().split('\n')
+                    echo "Changed files: ${changedFiles}"
+                }
             }
         }
     }
