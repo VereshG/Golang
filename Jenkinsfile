@@ -12,6 +12,8 @@ pipeline {
             steps {
                 echo 'Building after PR merge...'
                 // Your build steps here
+                echo 'Fetching latest main branch...'
+                sh 'git fetch origin main'
                 echo 'Changed files in this PR:'
                 sh 'git diff --name-only origin/main...HEAD'
             }
