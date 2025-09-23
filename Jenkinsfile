@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        SLACK_CHANNEL = '#your-channel'
-        SLACK_COLOR = 'good'
-        GITHUB_REPO = 'VereshG/Golang' // Replace with your actual repo
+        SLACK_CHANNEL_ID = 'C09F8HM77L6'
+        SLACK_TOKEN = credentials('SLACK_BOT_TOKEN') // Jenkins credential ID for your xoxb token
+        GITHUB_REPO = 'VereshG/Golang'
     }
 
     stages {
