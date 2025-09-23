@@ -47,6 +47,8 @@ pipeline {
         }
         success {
             script {
+                def memberCoreChannel = "C09G161KD0Q"
+                def memberFundsChannel = "C09F8HM77L6"
                 if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
@@ -90,6 +92,8 @@ Please review!
         }
         failure {
             script {
+                def memberCoreChannel = "C09G161KD0Q"
+                def memberFundsChannel = "C09F8HM77L6"
                 if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
                     def message = "❌ Build failed after PR merge on branch ${env.GIT_BRANCH}"
                     echo "Build failed. Notification sent to both channels."
