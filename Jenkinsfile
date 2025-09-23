@@ -55,6 +55,7 @@ pipeline {
                     def prAuthor = env.PR_AUTHOR
                     def prLink = env.PR_LINK
                     def sent = false
+                    // Notify membercore team if get_handler.go changed
                     if (changedFiles.contains('api/get_handler.go')) {
                         def appName = 'membercore'
                         def channelID = memberCoreChannel
@@ -78,6 +79,7 @@ Please review!
                         """
                         sent = true
                     }
+                    // Notify member funds team if post_handler.go changed
                     if (changedFiles.contains('api/post_handler.go')) {
                         def appName = 'member funds'
                         def channelID = memberFundsChannel
@@ -101,8 +103,29 @@ Please review!
                         """
                         sent = true
                     }
-                    if (!sent) {
-                        echo "No relevant API file changed. No notification sent."
+                    if (!changedFiles.contains('api/get_handler.go') && !changedFiles.contains('api/post_handler.go')) {
+                        // Notify about other changed files
+                        def otherFiles = changedFiles.findAll { it != 'api/get_handler.go' && it != 'api/post_handler.go' }
+                        if (otherFiles.size() > 0) {
+                            def channelID = generalChannel // Replace with your general channel variable or ID
+                            def message = """
+*✅ PR #${prNumber} merged by ${prAuthor}*
+${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
+*Other files changed:*
+${otherFiles.join('\n')}
+Please review!
+"""
+                            echo "Sending Slack notification to ${channelID} for non-endpoint file changes: ${otherFiles}"
+                            sh """
+                            curl -X POST \
+                                -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
+                                -H "Content-Type: application/json" \
+                                -d '{"channel": "${channelID}", "text": "${message}"}' \
+                                https://slack.com/api/chat.postMessage || echo "Slack notification failed"
+                            """
+                        } else {
+                            echo "No relevant API file changed. No notification sent."
+                        }
                     }
                 } else {
                     echo "PR was not merged to main branch. No notifications sent."
