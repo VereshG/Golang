@@ -13,5 +13,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getSharedMessage() string {
+	// Shared function between GET and POST handlers
 	return "This is a shared message between GET and POST handlers."
 }
