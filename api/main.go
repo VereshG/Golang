@@ -12,7 +12,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Received request from %s\n", r.RemoteAddr)
 	num := rand.Intn(1000)
 	fmt.Fprintf(w, "Hello! Your random number is: %d", num)
-	fmt.Fprintf(w, "Hello! Your random number is: %d", num)
 }
 
 func main() {
