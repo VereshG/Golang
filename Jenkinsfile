@@ -54,17 +54,10 @@ pipeline {
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
                     def prLink = env.PR_LINK
-                    def appName = ''
-                    def channelID = ''
+                    def sent = false
                     if (changedFiles.contains('api/get_handler.go')) {
-                        appName = 'membercore'
-                        channelID = memberCoreChannel
-                    }
-                    if (changedFiles.contains('api/post_handler.go')) {
-                        appName = 'member funds'
-                        channelID = memberFundsChannel
-                    }
-                    if (appName != '' && channelID != '') {
+                        def appName = 'membercore'
+                        def channelID = memberCoreChannel
                         echo "App Name: ${appName}"
                         echo "Notification sent to channel: ${channelID} for app: ${appName}"
                         def message = """
@@ -82,7 +75,31 @@ Please review!
                             -d '{"channel": "${channelID}", "text": "${message}"}' \
                             https://slack.com/api/chat.postMessage
                         """
-                    } else {
+                        sent = true
+                    }
+                    if (changedFiles.contains('api/post_handler.go')) {
+                        def appName = 'member funds'
+                        def channelID = memberFundsChannel
+                        echo "App Name: ${appName}"
+                        echo "Notification sent to channel: ${channelID} for app: ${appName}"
+                        def message = """
+*✅ PR #${prNumber} merged by ${prAuthor}*
+${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
+*Changed files:*
+${changedFiles.join('\n')}
+*API changed:* ${appName}
+Please review!
+"""
+                        sh """
+                        curl -X POST \
+                            -H "Authorization: Bearer ${env.SLACK_TOKEN}" \
+                            -H "Content-Type: application/json" \
+                            -d '{"channel": "${channelID}", "text": "${message}"}' \
+                            https://slack.com/api/chat.postMessage
+                        """
+                        sent = true
+                    }
+                    if (!sent) {
                         echo "No relevant API file changed. No notification sent."
                     }
                 } else {
