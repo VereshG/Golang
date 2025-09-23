@@ -6,6 +6,7 @@ import (
 )
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Dummy log: POST handler called for Jenkins diff test")
 	msg := getSharedMessage()
 	fmt.Fprintf(w, "POST request received. Shared message: %s", msg)
 }

@@ -7,6 +7,7 @@ import (
 
 // GetHandler depends on PostHandler for some shared logic
 func GetHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Dummy log: GET handler called for Jenkins diff test")
 	msg := getSharedMessage()
 	fmt.Fprintf(w, "GET request received. Shared message: %s", msg)
 }
