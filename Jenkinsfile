@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SLACK_CHANNEL_ID = 'C09F8HM77L6'
-        SLACK_TOKEN = credentials('Slack_Token') // Jenkins credential ID for your xoxb token
+        SLACK_TOKEN = credentials('SLACK_BOT_TOKEN') // Jenkins credential ID for your xoxb token
         GITHUB_REPO = 'VereshG/Golang'
     }
 
