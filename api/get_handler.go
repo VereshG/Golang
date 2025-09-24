@@ -13,3 +13,5 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // getSharedMessage is defined in post_handler.go
+// getSharedMessage is defined in post_handler.go
+// getSharedMessage is defined in post_handler.go
