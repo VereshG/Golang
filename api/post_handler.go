@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// this API is owned by funds team
 func PostHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Another dummy log: POST handler single file change test")
 	// [PR DEMO 9] Simulate change in POST endpoint for notification test
@@ -17,6 +18,3 @@ func getSharedMessage() string {
 
 	return "This is a shared message between GET and POST handlers."
 }
-
-// [PR DEMO 9] Simulate change in POST endpoint for notification test
-// [PR DEMO 9] Simulate change in POST endpoint for notification test

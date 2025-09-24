@@ -105,12 +105,29 @@ Please review!
                             https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                         """
                     } else if (changedFiles.size() > 0) {
-                        // If any other file (or both endpoints) changed, notify both teams
+                        // If any other file (or both endpoints) changed, notify both teams with full details
+                        def apiChanged = ''
+                        def teamNote = ''
+                        if (changedFiles.contains('api/get_handler.go') && changedFiles.contains('api/post_handler.go')) {
+                            apiChanged = 'Both endpoints changed'
+                            teamNote = 'Both teams are being notified of changes.'
+                        } else if (changedFiles.contains('api/get_handler.go')) {
+                            apiChanged = 'GET endpoint changed'
+                            teamNote = 'Funds team and core team are being notified of changes.'
+                        } else if (changedFiles.contains('api/post_handler.go')) {
+                            apiChanged = 'POST endpoint changed'
+                            teamNote = 'Core team and funds team are being notified of changes.'
+                        } else {
+                            apiChanged = 'Non-endpoint files changed'
+                            teamNote = 'Both teams are being notified of changes.'
+                        }
                         def message = """
 *✅ PR #${prNumber} merged by ${prAuthor}*
 ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
-*Files changed:*
+*Changed files:*
 ${changedFiles.join('\n')}
+*API changed:* ${apiChanged}
+*Note: ${teamNote}*
 Please review!
 """
                         echo "Sending Slack notification to ${memberCoreChannel} and ${memberFundsChannel} for non-endpoint or multiple endpoint file changes: ${changedFiles}"

@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// this API is owned by core team
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Dummy log: GET handler called for Jenkins diff test")
