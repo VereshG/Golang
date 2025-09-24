@@ -58,6 +58,7 @@ pipeline {
                     def prLink = env.PR_LINK
                     def sent = false
                     // Only notify relevant team if endpoint file changed
+                    // Define onlyGetChanged and onlyPostChanged only once in this block
                     def onlyGetChanged = changedFiles.every { it == 'api/get_handler.go' }
                     def onlyPostChanged = changedFiles.every { it == 'api/post_handler.go' }
                     if (onlyGetChanged) {
