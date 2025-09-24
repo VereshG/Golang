@@ -85,9 +85,7 @@ Please review!
                         """
                     } else if (onlyPostChanged) {
                         def appName = 'POST endpoint'
-                            // Only notify relevant team if endpoint file changed
-                            def onlyGetChanged = changedFiles.every { it == 'api/get_handler.go' }
-                            def onlyPostChanged = changedFiles.every { it == 'api/post_handler.go' }
+                        def channelID = memberCoreChannel // Notify core team when POST endpoint is changed
                         def message = """
 *✅ PR #${prNumber} merged by ${prAuthor}*
 ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
