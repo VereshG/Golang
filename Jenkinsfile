@@ -50,7 +50,8 @@ pipeline {
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
+                        // Send notification if PR is raised to release branch (not main)
+                        if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
@@ -132,8 +133,8 @@ Please review!
                     } else {
                         echo "No relevant file changed. No notification sent."
                     }
-                } else {
-                    echo "PR was not merged to main branch. No notifications sent."
+                        } else {
+                            echo "PR was not merged to release branch. No notifications sent."
                 }
             }
         }
