@@ -124,7 +124,7 @@ Please review!
                             (prLink != '' ? "🔗 <${prLink}|View PR>\n" : '') +
                             "*Changed files:*\n" + changedFiles.join('\n') + "\n" +
                             "*API changed:* ${apiChanged}\n" +
-                            "*Note: ${teamNote} ${teamNames} are being notified of changes.*\n" +
+                            "*Note: Core Team and Funds Team are being notified of changes.*\n" +
                             "Please review!"
                         echo "Sending Slack notification to ${memberCoreChannel} and ${memberFundsChannel} for non-endpoint or multiple endpoint file changes: ${changedFiles}"
                         // Notify memberCoreChannel
