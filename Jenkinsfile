@@ -50,7 +50,8 @@ pipeline {
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
+                        // Send notification if PR is raised to release branch (not main)
+                        if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
@@ -60,8 +61,8 @@ pipeline {
                     def onlyGetChanged = changedFiles.every { it == 'api/get_handler.go' }
                     def onlyPostChanged = changedFiles.every { it == 'api/post_handler.go' }
                     if (onlyGetChanged) {
-                        def appName = 'membercore'
-                        def channelID = memberCoreChannel
+                        def appName = 'GET endpoint'
+                        def channelID = memberFundsChannel // Notify funds team when GET endpoint is changed
                         echo "App Name: ${appName}"
                         echo "Notification sent to channel: ${channelID} for app: ${appName}"
                         def message = """
@@ -70,6 +71,7 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 *Changed files:*
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
+*Note: This endpoint is owned by the core team. Funds team is being notified of changes.*
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -81,8 +83,8 @@ Please review!
                             https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                         """
                     } else if (onlyPostChanged) {
-                        def appName = 'member funds'
-                        def channelID = memberFundsChannel
+                        def appName = 'POST endpoint'
+                        def channelID = memberCoreChannel // Notify core team when POST endpoint is changed
                         echo "App Name: ${appName}"
                         echo "Notification sent to channel: ${channelID} for app: ${appName}"
                         def message = """
@@ -91,6 +93,7 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 *Changed files:*
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
+*Note: This endpoint is owned by the funds team. Core team is being notified of changes.*
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -130,8 +133,8 @@ Please review!
                     } else {
                         echo "No relevant file changed. No notification sent."
                     }
-                } else {
-                    echo "PR was not merged to main branch. No notifications sent."
+                        } else {
+                            echo "PR was not merged to release branch. No notifications sent."
                 }
             }
         }
