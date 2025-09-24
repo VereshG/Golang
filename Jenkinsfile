@@ -49,18 +49,9 @@ pipeline {
         }
         success {
             script {
-                // AI-powered risk assessment
-                def diffSummary = sh(script: "git diff --stat ${previousCommit} ${currentCommit}", returnStdout: true).trim()
-                def aiPrompt = "Assess the risk level of this PR based on the following diff:\n${diffSummary}\nClassify as 'high impact', 'minor change', or 'needs careful review'."
-                def aiResponse = sh(script: """
-                    curl -s https://api.openai.com/v1/chat/completions \
-                        -H 'Authorization: Bearer ${env.OPENAI_API_KEY}' \
-                        -H 'Content-Type: application/json' \
-                        -d '{
-                            "model": "gpt-3.5-turbo",
-                            "messages": [{"role": "user", "content": "${aiPrompt}"}]
-                        }' | jq -r '.choices[0].message.content'
-                """, returnStdout: true).trim()
+                // Recalculate commit SHAs for post block
+                def previousCommit = sh(script: "git rev-parse HEAD^1", returnStdout: true).trim()
+                def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
                 // Send notification if this build is for a merge into the release branch from any other branch
