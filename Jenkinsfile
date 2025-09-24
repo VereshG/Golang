@@ -5,6 +5,7 @@ pipeline {
         SLACK_CHANNEL_ID = 'C09F8HM77L6'
         SLACK_TOKEN = credentials('SLACK_BOT_TOKEN') // Jenkins credential ID for your xoxb token
         GITHUB_REPO = 'VereshG/Golang'
+        OPENAI_API_KEY = credentials('OPENAI_API_KEY') // Add your OpenAI API key as a Jenkins secret
     }
 
     stages {
@@ -47,6 +48,18 @@ pipeline {
             }
         }
         success {
+                                // AI-powered risk assessment
+                                def diffSummary = sh(script: "git diff --stat ${previousCommit} ${currentCommit}", returnStdout: true).trim()
+                                def aiPrompt = "Assess the risk level of this PR based on the following diff:\n${diffSummary}\nClassify as 'high impact', 'minor change', or 'needs careful review'."
+                                def aiResponse = sh(script: """
+                                curl -s https://api.openai.com/v1/chat/completions \
+                                    -H 'Authorization: Bearer ${env.OPENAI_API_KEY}' \
+                                    -H 'Content-Type: application/json' \
+                                    -d '{
+                                        "model": "gpt-3.5-turbo",
+                                        "messages": [{"role": "user", "content": "${aiPrompt}"}]
+                                    }' | jq -r '.choices[0].message.content'
+                                """, returnStdout: true).trim()
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
@@ -72,6 +85,7 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
 *Note: This endpoint is owned by the core team. Funds team is being notified of changes.*
+*Risk Assessment:* ${aiResponse}
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -94,6 +108,7 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
 *Note: This endpoint is owned by the funds team. Core team is being notified of changes.*
+*Risk Assessment:* ${aiResponse}
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -128,6 +143,7 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 ${changedFiles.join('\n')}
 *API changed:* ${apiChanged}
 *Note: ${teamNote}*
+*Risk Assessment:* ${aiResponse}
 Please review!
 """
                         echo "Sending Slack notification to ${memberCoreChannel} and ${memberFundsChannel} for non-endpoint or multiple endpoint file changes: ${changedFiles}"
