@@ -13,7 +13,7 @@ import (
 // this API is owned by member funds team
 func PostHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Another dummy log: POST handler single file change test")
-	// [PR DEMO 9] Simulate change in POST endpoint for notification test
+
 	fmt.Println("Dummy log: POST handler called for Jenkins diff test")
 	msg := getSharedMessage()
 	fmt.Fprintf(w, "POST request received. Shared message: %s", msg)
