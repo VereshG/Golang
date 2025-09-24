@@ -33,8 +33,8 @@ func main() {
 	}
 
 	// Use provided App ID and API Key
-	appID := "29293bd0-493f-4f08-aef2-eba210b93093"
-	apiKey := "k780qwk3kly6pixcagzfdb3ib3kwn1b2xbcb4jb4"
+	appID := "589e9a5f-ebd7-49b3-936b-7bcb555b6210"
+	apiKey := "b8e0zu67y8zva3ha00hubjv5uf16blhzb2pbfy1l"
 	url := fmt.Sprintf("https://api.applicationinsights.io/v1/apps/%s/query", appID)
 	body := fmt.Sprintf(`{"query": %q}`, query)
 

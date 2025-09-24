@@ -12,8 +12,8 @@ pipeline {
             steps {
                 echo 'Building after PR merge...'
                 // Your build steps here
-                echo 'Fetching latest main branch...'
-                sh 'git fetch origin main'
+                echo 'Fetching latest release branch...'
+                sh 'git fetch origin release'
                 echo 'Getting previous and current commit SHAs...'
                 script {
                     def previousCommit = sh(script: "git rev-parse HEAD^1", returnStdout: true).trim()
@@ -50,7 +50,7 @@ pipeline {
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
+                    if ((env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') && (env.CHANGE_TARGET == 'release' || env.CHANGE_BRANCH == 'release')) {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
@@ -133,7 +133,7 @@ Please review!
                         echo "No relevant file changed. No notification sent."
                     }
                 } else {
-                    echo "PR was not merged to main branch. No notifications sent."
+                    echo "PR was not merged to release branch. No notifications sent."
                 }
             }
         }
@@ -141,7 +141,7 @@ Please review!
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
+                if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
                     def message = "❌ Build failed after PR merge on branch ${env.GIT_BRANCH}"
                     echo "Build failed. Notification sent to both channels."
                     echo "Notification sent to channel: ${memberCoreChannel}"
@@ -165,7 +165,7 @@ Please review!
                         https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                     """
                 } else {
-                    echo "Build failed, but not on main branch. No notifications sent."
+                    echo "Build failed, but not on release branch. No notifications sent."
                 }
             }
         }
