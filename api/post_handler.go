@@ -17,3 +17,6 @@ func getSharedMessage() string {
 
 	return "This is a shared message between GET and POST handlers."
 }
+
+// [PR DEMO 9] Simulate change in POST endpoint for notification test
+// [PR DEMO 9] Simulate change in POST endpoint for notification test

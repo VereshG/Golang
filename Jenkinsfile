@@ -12,8 +12,8 @@ pipeline {
             steps {
                 echo 'Building after PR merge...'
                 // Your build steps here
-                echo 'Fetching latest release branch...'
-                sh 'git fetch origin release'
+                echo 'Fetching latest main branch...'
+                sh 'git fetch origin main'
                 echo 'Getting previous and current commit SHAs...'
                 script {
                     def previousCommit = sh(script: "git rev-parse HEAD^1", returnStdout: true).trim()
@@ -50,7 +50,7 @@ pipeline {
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                    if ((env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') && (env.CHANGE_TARGET == 'release' || env.CHANGE_BRANCH == 'release')) {
+                if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
@@ -60,8 +60,8 @@ pipeline {
                     def onlyGetChanged = changedFiles.every { it == 'api/get_handler.go' }
                     def onlyPostChanged = changedFiles.every { it == 'api/post_handler.go' }
                     if (onlyGetChanged) {
-                        def appName = 'GET endpoint'
-                        def channelID = memberFundsChannel // Notify funds team when GET endpoint is changed
+                        def appName = 'membercore'
+                        def channelID = memberCoreChannel
                         echo "App Name: ${appName}"
                         echo "Notification sent to channel: ${channelID} for app: ${appName}"
                         def message = """
@@ -70,7 +70,6 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 *Changed files:*
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
-*Note: This endpoint is owned by the core team. Funds team is being notified of changes.*
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -82,8 +81,8 @@ Please review!
                             https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                         """
                     } else if (onlyPostChanged) {
-                        def appName = 'POST endpoint'
-                        def channelID = memberCoreChannel // Notify core team when POST endpoint is changed
+                        def appName = 'member funds'
+                        def channelID = memberFundsChannel
                         echo "App Name: ${appName}"
                         echo "Notification sent to channel: ${channelID} for app: ${appName}"
                         def message = """
@@ -92,7 +91,6 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 *Changed files:*
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
-*Note: This endpoint is owned by the funds team. Core team is being notified of changes.*
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -133,7 +131,7 @@ Please review!
                         echo "No relevant file changed. No notification sent."
                     }
                 } else {
-                    echo "PR was not merged to release branch. No notifications sent."
+                    echo "PR was not merged to main branch. No notifications sent."
                 }
             }
         }
@@ -141,7 +139,7 @@ Please review!
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
+                if (env.GIT_BRANCH == 'main' || env.BRANCH_NAME == 'main') {
                     def message = "❌ Build failed after PR merge on branch ${env.GIT_BRANCH}"
                     echo "Build failed. Notification sent to both channels."
                     echo "Notification sent to channel: ${memberCoreChannel}"
@@ -165,7 +163,7 @@ Please review!
                         https://slack.com/api/chat.postMessage || echo "Slack notification failed"
                     """
                 } else {
-                    echo "Build failed, but not on release branch. No notifications sent."
+                    echo "Build failed, but not on main branch. No notifications sent."
                 }
             }
         }
