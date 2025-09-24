@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// this API is owned by member core team
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// [PR DEMO 21] Simulate change in GET endpoint for notification test
