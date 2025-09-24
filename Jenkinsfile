@@ -48,23 +48,23 @@ pipeline {
             }
         }
         success {
-                                // AI-powered risk assessment
-                                def diffSummary = sh(script: "git diff --stat ${previousCommit} ${currentCommit}", returnStdout: true).trim()
-                                def aiPrompt = "Assess the risk level of this PR based on the following diff:\n${diffSummary}\nClassify as 'high impact', 'minor change', or 'needs careful review'."
-                                def aiResponse = sh(script: """
-                                curl -s https://api.openai.com/v1/chat/completions \
-                                    -H 'Authorization: Bearer ${env.OPENAI_API_KEY}' \
-                                    -H 'Content-Type: application/json' \
-                                    -d '{
-                                        "model": "gpt-3.5-turbo",
-                                        "messages": [{"role": "user", "content": "${aiPrompt}"}]
-                                    }' | jq -r '.choices[0].message.content'
-                                """, returnStdout: true).trim()
             script {
+                // AI-powered risk assessment
+                def diffSummary = sh(script: "git diff --stat ${previousCommit} ${currentCommit}", returnStdout: true).trim()
+                def aiPrompt = "Assess the risk level of this PR based on the following diff:\n${diffSummary}\nClassify as 'high impact', 'minor change', or 'needs careful review'."
+                def aiResponse = sh(script: """
+                    curl -s https://api.openai.com/v1/chat/completions \
+                        -H 'Authorization: Bearer ${env.OPENAI_API_KEY}' \
+                        -H 'Content-Type: application/json' \
+                        -d '{
+                            "model": "gpt-3.5-turbo",
+                            "messages": [{"role": "user", "content": "${aiPrompt}"}]
+                        }' | jq -r '.choices[0].message.content'
+                """, returnStdout: true).trim()
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                        // Send notification if PR is raised to release branch (not main)
-                        if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
+                // Send notification if PR is raised to release branch (not main)
+                if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
@@ -166,8 +166,8 @@ Please review!
                     } else {
                         echo "No relevant file changed. No notification sent."
                     }
-                        } else {
-                            echo "PR was not merged to release branch. No notifications sent."
+                } else {
+                    echo "PR was not merged to release branch. No notifications sent."
                 }
             }
         }
