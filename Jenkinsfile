@@ -69,8 +69,8 @@ pipeline {
                         def message = "*✅ PR #${prNumber} merged by ${prAuthor}*\n" +
                             (prLink != '' ? "🔗 <${prLink}|View PR>\n" : '') +
                             "*Changed files:*\n" + changedFiles.join('\n') + "\n" +
-                            "*API changed:* ${appName}\n" +
-                            "*Note: This endpoint is owned by the core team. Funds team is being notified of changes.*\n" +
+                            "*API changed:* ${appName} (api/get_handler.go)\n" +
+                            "*Note: This endpoint is owned by the core team.*\n" +
                             "Please review!"
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
                         sh """
@@ -83,15 +83,12 @@ pipeline {
                     } else if (onlyPostChanged) {
                         def appName = 'POST endpoint'
                         def channelID = memberCoreChannel // Notify core team when POST endpoint is changed
-                        def message = """
-*✅ PR #${prNumber} merged by ${prAuthor}*
-${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
-*Changed files:*
-${changedFiles.join('\n')}
-*API changed:* ${appName}
-*Note: This endpoint is owned by the funds team. Core team is being notified of changes.*
-Please review!
-"""
+                        def message = "*✅ PR #${prNumber} merged by ${prAuthor}*\n" +
+                            (prLink != '' ? "🔗 <${prLink}|View PR>\n" : '') +
+                            "*Changed files:*\n" + changedFiles.join('\n') + "\n" +
+                            "*API changed:* ${appName} (api/post_handler.go)\n" +
+                            "*Note: This endpoint is owned by the funds team.*\n" +
+                            "Please review!"
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
                         sh """
                         curl -X POST \
