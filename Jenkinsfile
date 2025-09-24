@@ -63,8 +63,9 @@ pipeline {
                 """, returnStdout: true).trim()
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                // Send notification if PR is raised to release branch (not main)
-                if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
+                // Send notification if this build is for a merge into the release branch from any other branch
+                // This works for PRs merged from develop/feature/etc. to release
+                if ((env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') && (env.CHANGE_TARGET == 'release' || env.CHANGE_BRANCH != 'release')) {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
