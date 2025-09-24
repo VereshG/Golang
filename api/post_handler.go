@@ -17,6 +17,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Dummy log: POST handler called for Jenkins diff test")
 	msg := getSharedMessage()
 	fmt.Fprintf(w, "POST request received. Shared message: %s", msg)
+	// [PR DEMO 21] Simulate change in POST endpoint for notification tests
 }
 
 func getSharedMessage() string {
