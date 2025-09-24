@@ -5,7 +5,6 @@ pipeline {
         SLACK_CHANNEL_ID = 'C09F8HM77L6'
         SLACK_TOKEN = credentials('SLACK_BOT_TOKEN') // Jenkins credential ID for your xoxb token
         GITHUB_REPO = 'VereshG/Golang'
-        OPENAI_API_KEY = credentials('OPENAI_API_KEY') // Add your OpenAI API key as a Jenkins secret
     }
 
     stages {
@@ -49,14 +48,10 @@ pipeline {
         }
         success {
             script {
-                // Recalculate commit SHAs for post block
-                def previousCommit = sh(script: "git rev-parse HEAD^1", returnStdout: true).trim()
-                def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                // Send notification if this build is for a merge into the release branch from any other branch
-                // This works for PRs merged from develop/feature/etc. to release
-                if ((env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') && (env.CHANGE_TARGET == 'release' || env.CHANGE_BRANCH != 'release')) {
+                        // Send notification if PR is raised to release branch (not main)
+                        if (env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
@@ -77,7 +72,6 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
 *Note: This endpoint is owned by the core team. Funds team is being notified of changes.*
-*Risk Assessment:* ${aiResponse}
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -100,7 +94,6 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 ${changedFiles.join('\n')}
 *API changed:* ${appName}
 *Note: This endpoint is owned by the funds team. Core team is being notified of changes.*
-*Risk Assessment:* ${aiResponse}
 Please review!
 """
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
@@ -135,7 +128,6 @@ ${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
 ${changedFiles.join('\n')}
 *API changed:* ${apiChanged}
 *Note: ${teamNote}*
-*Risk Assessment:* ${aiResponse}
 Please review!
 """
                         echo "Sending Slack notification to ${memberCoreChannel} and ${memberFundsChannel} for non-endpoint or multiple endpoint file changes: ${changedFiles}"
@@ -158,8 +150,8 @@ Please review!
                     } else {
                         echo "No relevant file changed. No notification sent."
                     }
-                } else {
-                    echo "PR was not merged to release branch. No notifications sent."
+                        } else {
+                            echo "PR was not merged to release branch. No notifications sent."
                 }
             }
         }
