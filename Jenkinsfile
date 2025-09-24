@@ -66,15 +66,12 @@ pipeline {
                         def channelID = memberFundsChannel // Notify funds team when GET endpoint is changed
                         echo "App Name: ${appName}"
                         echo "Notification sent to channel: ${channelID} for app: ${appName}"
-                        def message = """
-*✅ PR #${prNumber} merged by ${prAuthor}*
-${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
-*Changed files:*
-${changedFiles.join('\n')}
-*API changed:* ${appName}
-*Note: This endpoint is owned by the core team. Funds team is being notified of changes.*
-Please review!
-"""
+                        def message = "*✅ PR #${prNumber} merged by ${prAuthor}*\n" +
+                            (prLink != '' ? "🔗 <${prLink}|View PR>\n" : '') +
+                            "*Changed files:*\n" + changedFiles.join('\n') + "\n" +
+                            "*API changed:* ${appName}\n" +
+                            "*Note: This endpoint is owned by the core team. Funds team is being notified of changes.*\n" +
+                            "Please review!"
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
                         sh """
                         curl -X POST \
@@ -120,15 +117,15 @@ Please review!
                             apiChanged = 'Non-endpoint files changed'
                             teamNote = 'Both teams are being notified of changes.'
                         }
-                        def message = """
-*✅ PR #${prNumber} merged by ${prAuthor}*
-${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
-*Changed files:*
-${changedFiles.join('\n')}
-*API changed:* ${apiChanged}
-*Note: ${teamNote}*
-Please review!
-"""
+                        def endpointInfo = (changedFiles.contains('api/get_handler.go') ? 'GET endpoint (owned by Core Team)' : '') +
+                            (changedFiles.contains('api/post_handler.go') ? (changedFiles.contains('api/get_handler.go') ? ', ' : '') + 'POST endpoint (owned by Funds Team)' : '')
+                        def teamNames = 'Core Team (C09G161KD0Q) and Funds Team (C09F8HM77L6)'
+                        def message = "*✅ PR #${prNumber} merged by ${prAuthor}*\n" +
+                            (prLink != '' ? "🔗 <${prLink}|View PR>\n" : '') +
+                            "*Changed files:*\n" + changedFiles.join('\n') + "\n" +
+                            "*API changed:* ${apiChanged}\n" +
+                            "*Note: ${teamNote} ${teamNames}*\n" +
+                            "Please review!"
                         echo "Sending Slack notification to ${memberCoreChannel} and ${memberFundsChannel} for non-endpoint or multiple endpoint file changes: ${changedFiles}"
                         // Notify memberCoreChannel
                         sh """
