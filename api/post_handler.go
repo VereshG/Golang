@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-// this API is owned by funds team
+// this API is owned by member funds team
 func PostHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Another dummy log: POST handler single file change test")
 	// [PR DEMO 9] Simulate change in POST endpoint for notification test
