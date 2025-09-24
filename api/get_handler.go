@@ -1,5 +1,10 @@
 package main
 
+// get_handler.go
+// Handles GET requests for the Go API project.
+// This file contains the logic for the GET endpoint and is monitored by Jenkins for changes.
+// If this file is changed and merged to the release branch, Jenkins will notify the funds team via Slack.
+
 import (
 	"fmt"
 	"net/http"

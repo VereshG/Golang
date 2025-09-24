@@ -1,5 +1,10 @@
 package main
 
+// post_handler.go
+// Handles POST requests for the Go API project.
+// This file contains the logic for the POST endpoint and is monitored by Jenkins for changes.
+// If this file is changed and merged to the release branch, Jenkins will notify the core team via Slack.
+
 import (
 	"fmt"
 	"net/http"
