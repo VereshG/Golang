@@ -11,3 +11,6 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	msg := getSharedMessage()
 	fmt.Fprintf(w, "GET request received. Shared message: %s", msg)
 }
+
+// [PR DEMO 9] Simulate change in POST endpoint for notification test
+// [PR DEMO 9] Simulate change in POST endpoint for notification test
