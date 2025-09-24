@@ -50,7 +50,7 @@ pipeline {
             script {
                 def memberCoreChannel = "C09G161KD0Q"
                 def memberFundsChannel = "C09F8HM77L6"
-                    if ((env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') && (env.CHANGE_TARGET == 'release' || env.CHANGE_BRANCH == 'release')) {
+                    if ((env.GIT_BRANCH == 'release' || env.BRANCH_NAME == 'release') || (env.CHANGE_TARGET == 'release' || env.CHANGE_BRANCH == 'release')) {
                     def changedFiles = env.CHANGED_FILES.split(',')
                     def prNumber = env.PR_NUMBER
                     def prAuthor = env.PR_AUTHOR
