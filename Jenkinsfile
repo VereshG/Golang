@@ -122,7 +122,10 @@ Please review!
                         }
                         def message = """
 *✅ PR #${prNumber} merged by ${prAuthor}*
-${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
+                            def endpointInfo = changedFiles.contains('api/get_handler.go') ? 'GET endpoint (owned by Core Team)' : 'No endpoint files changed'
+                            endpointInfo += changedFiles.contains('api/post_handler.go') ? ', POST endpoint (owned by Funds Team)' : ''
+                            def teamNames = 'Core Team (C09G161KD0Q) and Funds Team (C09F8HM77L6)'
+                            def message = """
 *Changed files:*
 ${changedFiles.join('\n')}
 *API changed:* ${apiChanged}
