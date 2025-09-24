@@ -66,15 +66,12 @@ pipeline {
                         def channelID = memberFundsChannel // Notify funds team when GET endpoint is changed
                         echo "App Name: ${appName}"
                         echo "Notification sent to channel: ${channelID} for app: ${appName}"
-                        def message = """
-*✅ PR #${prNumber} merged by ${prAuthor}*
-${prLink != '' ? "🔗 <${prLink}|View PR>\n" : ''}
-*Changed files:*
-${changedFiles.join('\n')}
-*API changed:* ${appName}
-*Note: This endpoint is owned by the core team. Funds team is being notified of changes.*
-Please review!
-"""
+                        def message = "*✅ PR #${prNumber} merged by ${prAuthor}*\n" +
+                            (prLink != '' ? "🔗 <${prLink}|View PR>\n" : '') +
+                            "*Changed files:*\n" + changedFiles.join('\n') + "\n" +
+                            "*API changed:* ${appName}\n" +
+                            "*Note: This endpoint is owned by the core team. Funds team is being notified of changes.*\n" +
+                            "Please review!"
                         echo "Sending Slack notification to ${channelID} with message: ${message}"
                         sh """
                         curl -X POST \
